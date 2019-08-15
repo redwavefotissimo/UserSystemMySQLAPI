@@ -27,11 +27,18 @@ private void closeConnection(Connection con, PreparedStatement statement, Result
 	}
 }
 
-public ArrayList<UserInfo> getUserInfo() throws Exception{
-	return getUserInfo("", "");
+private String translateColumnNameFromTable(String columnName){
+	if(columnName.equals("firstName")){
+		return "FirstName";
+	}
+	return "";
 }
 
-public ArrayList<UserInfo> getUserInfo(String offset, String limit) throws Exception{
+public ArrayList<UserInfo> getUserInfo() throws Exception{
+	return getUserInfo("", "", "", "");
+}
+
+public ArrayList<UserInfo> getUserInfo(String offset, String limit, String sort, String order) throws Exception{
 	Connection con = null;
 	PreparedStatement statement = null;
 	ResultSet rs = null;
@@ -42,6 +49,10 @@ public ArrayList<UserInfo> getUserInfo(String offset, String limit) throws Excep
 		con = getConnection();
 		
 		String sql = "Select * from UserInfoTable";
+		
+		if(!sort.isEmpty() && !order.isEmpty()){
+			sql += " ORDER BY "+translateColumnNameFromTable(sort)+" " + order;
+		}
 		
 		if(!offset.isEmpty() && !limit.isEmpty()){
 			sql += " LIMIT "+limit+" OFFSET " + offset;
@@ -69,6 +80,48 @@ public ArrayList<UserInfo> getUserInfo(String offset, String limit) throws Excep
 		closeConnection(con, statement, rs);
 	}
 	return userInfos;
+}
+
+public long getTotalUser() throws Exception{
+	return getTotalUser("");
+}
+
+public long getTotalUser(String where, Object... params) throws Exception{
+	long total = 0;
+	
+	Connection con = null;
+	PreparedStatement statement = null;
+	ResultSet rs = null;
+	
+	try{
+		con = getConnection();
+		
+		String sql = "Select count(*) as total from UserInfoTable";
+		
+		if(!where.isEmpty()){
+			sql += " WHERE "+ where;
+		}
+		
+		statement = con.prepareStatement(sql);
+		
+		if(!where.isEmpty() && params != null){
+			int col = 1;
+			for(Object param : params){
+				statement.setObject(col, param);
+			}
+		}
+		
+		rs = statement.executeQuery();
+		
+		while(rs.next()){
+			total = rs.getLong("total");
+		}
+	}
+	finally{
+		closeConnection(con, statement, rs);
+	}
+	
+	return total;
 }
 
 public UserInfo getUserInfo(String userName) throws Exception{

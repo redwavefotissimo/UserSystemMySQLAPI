@@ -19,6 +19,14 @@ if(userInfo == null){
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="PLUGINS/bootstrap.min.css">
+<link rel="stylesheet" href="PLUGINS/bootstrap-table.min.css">
+
+<script src="PLUGINS/jquery-3.4.1.min.js"></script>
+<script src="PLUGINS/jquery-migrate-3.0.1.min.js"></script>
+<script src="PLUGINS/popper.min.js"></script>
+<script src="PLUGINS/bootstrap.min.js"></script>
+<script src="PLUGINS/bootstrap-table.min.js"></script>
 
 <title><%= pageName %></title>
 </head>

@@ -5,6 +5,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="PLUGINS/bootstrap.min.css">
+<script src="PLUGINS/bootstrap.min.js"></script>
 <title>Login</title>
 </head>
 <body>
@@ -17,7 +19,7 @@ String password = CommonUtils.convertNullToString(request.getParameter("password
 %>
 <form method="post" action="<%= "LoginServer.jsp" %>">
     <center>
-    <table border="1" width="30%" cellpadding="3">
+    <table  cellpadding="3">
         <thead>
             <tr>
                 <th colspan="2">Login Here</th>
@@ -34,6 +36,7 @@ String password = CommonUtils.convertNullToString(request.getParameter("password
             </tr>
             <tr>
                 <td><input type="submit" value="Login" /></td>
+                <td><a href="RegisterUser.jsp">Register</a></td>
             </tr>
         </tbody>
     </table>
