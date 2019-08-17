@@ -1,21 +1,26 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.io.BufferedReader" %>
-<%@include file="COMMON.jsp" %>
+<%@include file="../COMMON.jsp" %>
 <%
 UserSystemMySQLAPIResponse userSystemResponse = new UserSystemMySQLAPIResponse();
 StringBuffer jb = new StringBuffer();
 String line = null;
 boolean success = false;
+UserInfo userInfo = new UserInfo();
 try {
 		BufferedReader reader = request.getReader();
 		while ((line = reader.readLine()) != null){
 			jb.append(line);
 		}
 
-		UserInfo userInfo = (UserInfo) CommonUtils.convertJsonStringToObject(jb.toString(), UserInfo.class);
+		userInfo = (UserInfo) CommonUtils.convertJsonStringToObject(jb.toString(), UserInfo.class);
 		
-		success = this.updateUser(userInfo);
+		userInfo = this.login(userInfo.userName, userInfo.password);
+		
+		if(userInfo.firstName != null && !userInfo.firstName.isEmpty()){
+			success = true;
+		}
 } 
 catch (Exception e) 
 {
@@ -23,16 +28,21 @@ catch (Exception e)
 	e.printStackTrace(); 
 }
 
+String jsonToSend = "";
+
+
 if(success){
-	userSystemResponse.statusCode = 200;
-	userSystemResponse.message = "UPDATE SUCCESSFULL!";
+	response.setStatus(200);
+	jsonToSend = CommonUtils.convertObjectToJsonString(userInfo);
 }
 else{
+	response.setStatus(500);
 	userSystemResponse.statusCode = 500;
-	userSystemResponse.message += ". ERROR IN UPDATE.";
+	userSystemResponse.message += ". ERROR IN INSERT.";
+	jsonToSend = CommonUtils.convertObjectToJsonString(userSystemResponse);
 }
 
 response.setContentType("application/json");
 response.setCharacterEncoding("UTF-8");
-response.getWriter().write(CommonUtils.convertObjectToJsonString(userSystemResponse));
+response.getWriter().write(jsonToSend);
 %>

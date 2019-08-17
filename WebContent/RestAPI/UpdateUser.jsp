@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.io.BufferedReader" %>
-<%@include file="COMMON.jsp" %>
+<%@include file="../COMMON.jsp" %>
 <%
 UserSystemMySQLAPIResponse userSystemResponse = new UserSystemMySQLAPIResponse();
 StringBuffer jb = new StringBuffer();
@@ -15,7 +15,7 @@ try {
 
 		UserInfo userInfo = (UserInfo) CommonUtils.convertJsonStringToObject(jb.toString(), UserInfo.class);
 		
-		success = this.insertUser(userInfo);
+		success = this.updateUser(userInfo);
 } 
 catch (Exception e) 
 {
@@ -23,15 +23,13 @@ catch (Exception e)
 	e.printStackTrace(); 
 }
 
-
-
 if(success){
 	userSystemResponse.statusCode = 200;
-	userSystemResponse.message = "INSERT SUCCESSFULL!";
+	userSystemResponse.message = "UPDATE SUCCESSFULL!";
 }
 else{
 	userSystemResponse.statusCode = 500;
-	userSystemResponse.message += ". ERROR IN INSERT.";
+	userSystemResponse.message += ". ERROR IN UPDATE.";
 }
 
 response.setContentType("application/json");
