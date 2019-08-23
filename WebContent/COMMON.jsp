@@ -259,4 +259,103 @@ public boolean updateUser(UserInfo userForUpdate) throws Exception{
 	
 	return success;
 }
+
+public boolean insertToAttachment(long userRecId, String AtachmentId) throws Exception{
+	
+	Connection con = null;
+	PreparedStatement statement = null;
+	ResultSet rs = null;
+	boolean success = false;
+
+	try{
+		con = getConnection();
+		
+		statement = con.prepareStatement("insert into AttachmentTable (UserRecId, AttachmentId, createDate) "+
+		" values (?, ?, NOW())");
+		
+		int column = 1;
+		statement.setLong(column++, userRecId);
+		statement.setString(column++, AtachmentId);
+		
+		statement.execute();
+		
+		success = true;
+	}
+	finally{
+		closeConnection(con, statement, rs);
+	}
+	return success;
+}
+
+public UserAttachmentListInfo getUserAttachments(long userId, String offset, String limit, String sort, String order) throws Exception{
+	
+	Connection con = null;
+	PreparedStatement statement = null;
+	ResultSet rs = null;
+	
+	UserAttachmentListInfo userAttachments = new UserAttachmentListInfo();
+	userAttachments.UserAttachmentInfo = new ArrayList<UserAttachmentInfo>();
+
+	try{
+		con = getConnection();
+		
+		String sql = "Select * from AttachmentTable where UserRecId = ? ";
+		
+		if(!sort.isEmpty() && !order.isEmpty()){
+			sql += " ORDER BY "+translateColumnNameFromTable(sort)+" " + order;
+		}
+		
+		if(!offset.isEmpty() && !limit.isEmpty()){
+			sql += " LIMIT "+limit+" OFFSET " + offset;
+		}
+		
+		statement = con.prepareStatement(sql);
+		
+		statement.setLong(1, userId);
+		
+		rs = statement.executeQuery();
+		
+		while(rs.next()){
+			UserAttachmentInfo userAttachmentInfo = new UserAttachmentInfo();
+			userAttachmentInfo.userRecId = rs.getLong("UserRecId");
+			userAttachmentInfo.attachmentId = rs.getString("AttachmentId");
+			
+			userAttachments.UserAttachmentInfo.add(userAttachmentInfo);
+		}
+	}
+	finally{
+		closeConnection(con, statement, rs);
+	}	
+	
+	return userAttachments;
+}
+
+public long getTotalUser(String userId) throws Exception{
+	long total = 0;
+	
+	Connection con = null;
+	PreparedStatement statement = null;
+	ResultSet rs = null;
+	
+	try{
+		con = getConnection();
+		
+		String sql = "Select count(*) as total from AttachmentTable where UserRecId = ?";
+		
+		statement = con.prepareStatement(sql);
+		
+		statement.setString(1, userId);
+		
+		rs = statement.executeQuery();
+		
+		while(rs.next()){
+			total = rs.getLong("total");
+		}
+	}
+	finally{
+		closeConnection(con, statement, rs);
+	}
+	
+	return total;
+}
 %>
